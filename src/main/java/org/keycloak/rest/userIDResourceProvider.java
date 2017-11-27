@@ -31,12 +31,12 @@ import ru.keycloak.util.jwtUtil;
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
  */
-public class HelloResourceProvider implements RealmResourceProvider {
+public class userIDResourceProvider implements RealmResourceProvider {
 
     private KeycloakSession session;
     public Logger log = Logger.getLogger(getClass().getName());
 
-    public HelloResourceProvider(KeycloakSession session) {
+    public userIDResourceProvider(KeycloakSession session) {
         this.session = session;
     }
 
@@ -54,17 +54,20 @@ public class HelloResourceProvider implements RealmResourceProvider {
 
         String[] resArr = result.split(",");
         for (int i = 0; i < resArr.length; i++) {
-            log.log(Level.INFO, "resArr[{0}] => {1}", new Object[]{i, resArr[i]});
+            //log.log(Level.INFO, "resArr[{0}] => {1}", new Object[]{i, resArr[i]});
             if (resArr[i].contains("\"sub\":")) {
                 String[] tempList = resArr[i].split(":");
-                log.log(Level.INFO, "len => {0}", tempList.length);
+                log.log(Level.INFO, "resArr[{0}] => {1}", new Object[]{i, resArr[i]});
+                //log.log(Level.INFO, "len => {0}", tempList.length);
                 if (tempList.length > 2) {
                     int pos = resArr[i].indexOf(":");
-                    log.log(Level.INFO, "pos => {0}", pos);
+                    //log.log(Level.INFO, "pos => {0}", pos);
                     result = resArr[i].substring(pos+1).replaceAll("\"", "");
+                    break;
                 }
             }
         }
+        log.log(Level.INFO, "result => {0}", result);
         return result;
     }
 
