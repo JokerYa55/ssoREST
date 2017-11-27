@@ -26,6 +26,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import ru.keycloak.util.jwtUtil;
 
 /**
  * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
@@ -47,30 +48,9 @@ public class HelloResourceProvider implements RealmResourceProvider {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String get(@CookieParam("KEYCLOAK_IDENTITY") Cookie cookie) {
-        String name = session.getContext().getRealm().getDisplayName();
-        if (name == null) {
-            name = session.getContext().getRealm().getName();
-        }
+        log.info("get() => " + cookie.getName());
 
-        String result = "";
-
-        String[] parts = cookie.getValue().split("[.]");
-        try {
-            int index = 0;
-            for (String part : parts) {
-                if (index >= 2) {
-                    break;
-                }
-
-                index++;
-                byte[] partAsBytes = part.getBytes("UTF-8");
-                String decodedPart = new String(java.util.Base64.getUrlDecoder().decode(partAsBytes), "UTF-8");
-
-                result += decodedPart;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Couldnt decode jwt", e);
-        }
+        String result = jwtUtil.decodeToken(cookie.getValue());
 
         String[] resArr = result.split(",");
         for (int i = 0; i < resArr.length; i++) {
@@ -92,4 +72,6 @@ public class HelloResourceProvider implements RealmResourceProvider {
     public void close() {
     }
 
+    
+    
 }
